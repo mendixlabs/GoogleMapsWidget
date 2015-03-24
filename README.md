@@ -1,0 +1,2 @@
+# GoogleMapsWidget
+Google Maps Widget
