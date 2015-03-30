@@ -41,7 +41,8 @@ require([
 
 
         // dojo.declare.constructor is called to construct the widget instance. Implement to initialize non-primitive properties.
-        constructor: function () {},
+        constructor: function () {
+        },
 
         // dijit._WidgetBase.postCreate is called after constructing the widget. Implement to do extra setup work.
         postCreate: function () {
@@ -59,11 +60,14 @@ require([
             console.log(this.id + '.update');
 
             this._contextObj = obj;
+
+            //subscribe to changes
+            this._resetSubscriptions();
             if (this._googleMap) {
                 this._fetchMarkers();
             }
-            
-            if(this.gotocontext) {
+
+            if (this.gotocontext) {
                 this._goToContext();
             }
             callback();
@@ -81,7 +85,9 @@ require([
 
         // mxui.widget._WidgetBase.resize is called when the page's layout is recalculated. Implement to do sizing calculations. Prefer using CSS instead.
         resize: function (box) {
-
+            if (this._googleMap) {
+                google.maps.event.trigger(this._googleMap, 'resize');
+            }
         },
 
         // mxui.widget._WidgetBase.uninitialize is called when the widget is destroyed. Implement to do special tear-down work.
@@ -135,7 +141,7 @@ require([
             console.log(this.id + '_loadMap');
             domStyle.set(this.mapContainer, {
                 height: this.mapHeight + 'px',
-                width: this.mapwidth
+                width: this.mapWidth
             });
 
             this._googleMap = new google.maps.Map(this.mapContainer, {
@@ -147,6 +153,7 @@ require([
                 }
             });
             if (this.gotocontext) {
+                this._googleMap.setZoom(this.lowestZoom);
                 this._fetchMarkers();
             }
 
@@ -158,7 +165,6 @@ require([
             if (this.updateRefresh) {
                 this._fetchFromDB();
             } else {
-                console.log('cache! ', this._markerCache);
                 if (this._markerCache) {
                     this._fetchFromCache();
                 } else {
@@ -183,6 +189,8 @@ require([
                         });
                     })
                 });
+            } else if (!this._contextObj && (xpath.indexOf('[%CurrentObject%]') > -1)) {
+                console.warn('No context for xpath, not fetching.');
             } else {
                 mx.data.get({
                     xpath: xpath,
@@ -204,9 +212,13 @@ require([
             this._removeAllMarkers();
             if (!this.gotocontext) {
                 dojoArray.forEach(this._markerCache, function (marker) {
-                    marker.setMap(self._googleMap);
-                    if (self._contextObj.getGuid() === marker.id) {
-                        cached = true;
+                    if (self._contextObj) {
+                        if (marker.id === self._contextObj.getGuid()) {
+                            marker.setMap(self._googleMap);
+                            cached = true;
+                        }
+                    } else {
+                        marker.setMap(self._googleMap);
                     }
                 });
                 //fetch from the database if not already cached.
@@ -215,13 +227,21 @@ require([
                     this._fetchFromDB();
                 }
             } else {
-                if(this._markerCache.length === 0){
+                if (this._markerCache.length === 0) {
                     console.log('not cached yet');
                     this._fetchFromDB();
                 }
-                
+
                 dojoArray.forEach(this._markerCache, function (marker) {
-                    marker.setMap(self._googleMap);
+                    if (self._contextObj && marker.id) {
+                        //if there's a context, set markers connected to this context
+                        if (marker.id === self._contextObj.getGuid()) {
+                            marker.setMap(self._googleMap);
+                        }
+                    } else {
+                        //just set all of them
+                        marker.setMap(self._googleMap);
+                    }
                 });
             }
 

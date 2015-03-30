@@ -57,7 +57,7 @@
             <category>Appearance</category>
             <description>The map's height in px.</description> 
         </property>
-        <property key="mapWidth" type="string">
+        <property key="mapWidth" type="string" defaultValue="100%">
             <caption>Width</caption>
             <category>Appearance</category>
             <description>The map's width in px or percent.</description> 
@@ -113,7 +113,6 @@
             <category>Appearance</category>
             <description>The default image to use if no enumeration is available.</description>
         </property>
-        
         <property key="markerImages" type="object" isList="true" required="false">
             <caption>Enum based marker images</caption>
             <category>Appearance</category>
