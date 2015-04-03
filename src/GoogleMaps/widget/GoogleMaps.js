@@ -41,8 +41,7 @@ require([
 
 
         // dojo.declare.constructor is called to construct the widget instance. Implement to initialize non-primitive properties.
-        constructor: function () {
-        },
+        constructor: function () {},
 
         // dijit._WidgetBase.postCreate is called after constructing the widget. Implement to do extra setup work.
         postCreate: function () {
@@ -58,7 +57,6 @@ require([
         // mxui.widget._WidgetBase.update is called when context is changed or initialized. Implement to re-render and / or fetch data.
         update: function (obj, callback) {
             console.log(this.id + '.update');
-
             this._contextObj = obj;
 
             //subscribe to changes
@@ -67,9 +65,6 @@ require([
                 this._fetchMarkers();
             }
 
-            if (this.gotocontext) {
-                this._goToContext();
-            }
             callback();
         },
 
@@ -85,6 +80,7 @@ require([
 
         // mxui.widget._WidgetBase.resize is called when the page's layout is recalculated. Implement to do sizing calculations. Prefer using CSS instead.
         resize: function (box) {
+            console.log(this.id + '_resize');
             if (this._googleMap) {
                 google.maps.event.trigger(this._googleMap, 'resize');
             }
@@ -152,8 +148,8 @@ require([
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
                 }
             });
+
             if (this.gotocontext) {
-                this._googleMap.setZoom(this.lowestZoom);
                 this._fetchMarkers();
             }
 
@@ -162,44 +158,52 @@ require([
         //Fetch markers
         _fetchMarkers: function () {
             console.log(this.id + '_fetchMarkers');
-            if (this.updateRefresh) {
-                this._fetchFromDB();
+
+            if (this.gotocontext) {
+                this._goToContext();
             } else {
-                if (this._markerCache) {
-                    this._fetchFromCache();
-                } else {
+                if (this.updateRefresh) {
+
                     this._fetchFromDB();
+                } else {
+                    if (this._markerCache) {
+                        this._fetchFromCache();
+                    } else {
+                        this._fetchFromDB();
+                    }
                 }
             }
+
         },
 
         _fetchFromDB: function () {
             console.log(this.id + '_fetchFromDB');
-            var xpath = '//' + this.mapEntity + this.xpathConstraint;
+            var xpath = '//' + this.mapEntity + this.xpathConstraint,
+                //extract this function because we use it twice
+                cb = function (objs) {
+                    var self = this,
+                        bounds = new google.maps.LatLngBounds();
+                    dojoArray.forEach(objs, function (obj, index) {
+                        self._addMarker(obj);
+                        bounds.extend(new google.maps.LatLng(obj.get(self.latAttr), obj.get(self.lngAttr)));
+                        if (index === objs.length - 1) {
+                            self._googleMap.fitBounds(bounds);
+                        }
+                    });
+                };
             this._removeAllMarkers();
             if (this._contextObj) {
                 xpath = xpath.replace('[%CurrentObject%]', this._contextObj.getGuid());
-
                 mx.data.get({
                     xpath: xpath,
-                    callback: lang.hitch(this, function (objs) {
-                        var self = this;
-                        dojoArray.forEach(objs, function (obj, index) {
-                            self._addMarker(obj);
-                        });
-                    })
+                    callback: lang.hitch(this, cb)
                 });
             } else if (!this._contextObj && (xpath.indexOf('[%CurrentObject%]') > -1)) {
                 console.warn('No context for xpath, not fetching.');
             } else {
                 mx.data.get({
                     xpath: xpath,
-                    callback: lang.hitch(this, function (objs) {
-                        var self = this;
-                        dojoArray.forEach(objs, function (obj, index) {
-                            self._addMarker(obj);
-                        });
-                    })
+                    callback: lang.hitch(this, cb)
                 });
             }
         },
@@ -207,42 +211,29 @@ require([
         _fetchFromCache: function () {
             console.log(this.id + '_fetchFromCache');
             var self = this,
-                cached = false;
+                cached = false,
+                bounds = new google.maps.LatLngBounds();
 
             this._removeAllMarkers();
-            if (!this.gotocontext) {
-                dojoArray.forEach(this._markerCache, function (marker) {
-                    if (self._contextObj) {
-                        if (marker.id === self._contextObj.getGuid()) {
-                            marker.setMap(self._googleMap);
-                            cached = true;
-                        }
-                    } else {
-                        marker.setMap(self._googleMap);
-                    }
-                });
-                //fetch from the database if not already cached.
-                if (!cached) {
-                    console.log('not cached yet');
-                    this._fetchFromDB();
-                }
-            } else {
-                if (this._markerCache.length === 0) {
-                    console.log('not cached yet');
-                    this._fetchFromDB();
-                }
 
-                dojoArray.forEach(this._markerCache, function (marker) {
-                    if (self._contextObj && marker.id) {
-                        //if there's a context, set markers connected to this context
-                        if (marker.id === self._contextObj.getGuid()) {
-                            marker.setMap(self._googleMap);
-                        }
-                    } else {
-                        //just set all of them
+            dojoArray.forEach(this._markerCache, function (marker, index) {
+                if (self._contextObj) {
+                    if (marker.id === self._contextObj.getGuid()) {
                         marker.setMap(self._googleMap);
+                        bounds.extend(marker.position);
+                        cached = true;
                     }
-                });
+                } else {
+                    marker.setMap(self._googleMap);
+                }
+                if (index === self._markerCache.length - 1) {
+                    self._googleMap.fitBounds(bounds);
+                }
+            });
+            //fetch from the database if not already cached.
+            if (!cached) {
+                console.log('not cached yet');
+                this._fetchFromDB();
             }
 
         },
@@ -303,8 +294,10 @@ require([
 
         _goToContext: function () {
             console.log(this.id + '_goToContext');
-            var self = this;
+            this._removeAllMarkers();
             if (this._googleMap && this._contextObj) {
+                this._googleMap.setZoom(this.lowestZoom);
+                this._addMarker(this._contextObj);
                 this._googleMap.panTo(new google.maps.LatLng(this._contextObj.get(this.latAttr), this._contextObj.get(this.lngAttr)));
             }
         }

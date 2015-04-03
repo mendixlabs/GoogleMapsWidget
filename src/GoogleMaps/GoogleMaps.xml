@@ -42,7 +42,7 @@
         <property key="gotocontext" type="boolean" defaultValue="false">
             <caption>Pan to context</caption>
             <category>Behavior</category>
-            <description>If set to true, if the dataview object changes, the map will pan automatically to the accompanying marker. In this case, the context cannot be used to constrain the source data. (So you cannot use [%CurrentObject%] in the xpath constraint)</description>
+            <description>If set to true, if the dataview object changes, the map will pan automatically to the accompanying marker. In this case, the widget will assume that the contextobject contains a lat and long attribute.</description>
         </property>
         <property key="markerDisplayAttr" type="attribute" required="false" entityProperty="mapEntity" isPath="optional" pathType="reference">
             <caption>Marker attribute</caption>
