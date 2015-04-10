@@ -277,7 +277,10 @@ require([
                         markerImageURL = imageObj.enumImage;
                     }
                 });
+            } else if(this.defaultIcon) {
+                markerImageURL = this.defaultIcon;
             }
+            
             //set marker image
             if (markerImageURL) {
                 marker.setIcon(markerImageURL);
