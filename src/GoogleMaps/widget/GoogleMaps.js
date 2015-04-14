@@ -149,9 +149,7 @@ require([
                 }
             });
 
-            if (this.gotocontext) {
-                this._fetchMarkers();
-            }
+            this._fetchMarkers();
 
         },
 
