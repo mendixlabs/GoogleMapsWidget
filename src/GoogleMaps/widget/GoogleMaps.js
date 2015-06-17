@@ -4,8 +4,8 @@
 define([
     'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
     'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang',
-    'dojo/text!GoogleMaps/widget/template/GoogleMaps.html'
-], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, widgetTemplate) {
+    'GoogleMaps/lib/googlemaps!', 'dojo/text!GoogleMaps/widget/template/GoogleMaps.html'
+], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, googleMaps, widgetTemplate) {
     'use strict';
 
     return declare('GoogleMaps.widget.GoogleMaps', [_WidgetBase, _TemplatedMixin], {
@@ -25,7 +25,6 @@ define([
             });
 
             this._loadGoogle();
-            this._setupEvents();
         },
 
         update: function (obj, callback) {
@@ -70,14 +69,7 @@ define([
 
         _loadGoogle: function () {
             console.log(this.id + '_loadGoogle');
-            if (!window.google) {
-                this._googleScript = dom.create('script');
-                this._googleScript.type = 'text/javascript';
-                this._googleScript.src = 'https://maps.googleapis.com/maps/api/js?v=3&callback=' + this.id + '_mapsCallback';
-                domConstruct.place(this._googleScript, this.domNode);
-            } else {
-                this._loadMap();
-            }
+	    this._loadMap();
         },
 
         _loadMap: function () {
