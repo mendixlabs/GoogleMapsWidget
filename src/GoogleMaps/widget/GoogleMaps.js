@@ -281,7 +281,7 @@ require([
             
             //set marker image
             if (markerImageURL) {
-                marker.setIcon(markerImageURL);
+                marker.setIcon(window.mx.appUrl + markerImageURL);
             }
 
             //build cache
