@@ -24,7 +24,7 @@ define([
                 this._loadMap();
             });
 
-            this._loadGoogle();
+            this._loadMap();
         },
 
         update: function (obj, callback) {
@@ -65,11 +65,6 @@ define([
                     })
                 });
             }
-        },
-
-        _loadGoogle: function () {
-            console.log(this.id + '_loadGoogle');
-	    this._loadMap();
         },
 
         _loadMap: function () {
