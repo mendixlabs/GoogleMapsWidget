@@ -19,7 +19,6 @@ define([
 
 
         postCreate: function () {
-            console.log(this.id + '.postCreate');
             window[this.id + "_mapsCallback"] = lang.hitch(this, function () {
                 this._loadMap();
             });
@@ -28,7 +27,6 @@ define([
         },
 
         update: function (obj, callback) {
-            console.log(this.id + '.update');
             this._contextObj = obj;
 
             this._resetSubscriptions();
@@ -40,7 +38,6 @@ define([
         },
 
         resize: function (box) {
-            console.log(this.id + '_resize');
             if (this._googleMap) {
                 google.maps.event.trigger(this._googleMap, 'resize');
             }
@@ -51,7 +48,6 @@ define([
         },
 
         _resetSubscriptions: function () {
-            console.log(this.id + '_resetSubscriptions');
             if (this._handle) {
                 this.unsubscribe(this._handle);
                 this._handle = null;
@@ -68,7 +64,6 @@ define([
         },
 
         _loadMap: function () {
-            console.log(this.id + '_loadMap');
             domStyle.set(this.mapContainer, {
                 height: this.mapHeight + 'px',
                 width: this.mapWidth
@@ -88,8 +83,6 @@ define([
         },
 
         _fetchMarkers: function () {
-            console.log(this.id + '_fetchMarkers');
-
             if (this.gotocontext) {
                 this._goToContext();
             } else {
@@ -108,7 +101,6 @@ define([
         },
 
         _fetchFromDB: function () {
-            console.log(this.id + '_fetchFromDB');
             var xpath = '//' + this.mapEntity + this.xpathConstraint,
                 cb = function (objs) {
                     var self = this,
@@ -139,7 +131,6 @@ define([
         },
 
         _fetchFromCache: function () {
-            console.log(this.id + '_fetchFromCache');
             var self = this,
                 cached = false,
                 bounds = new google.maps.LatLngBounds();
@@ -162,14 +153,12 @@ define([
             });
 
             if (!cached) {
-                console.log('not cached yet');
                 this._fetchFromDB();
             }
 
         },
 
         _removeAllMarkers: function () {
-            console.log(this.id + '_removeAllMarkers');
             if (this._markerCache) {
                 dojoArray.forEach(this._markerCache, function (marker) {
                     marker.setMap(null);
@@ -178,7 +167,6 @@ define([
         },
 
         _addMarker: function (obj) {
-            console.log(this.id + '_addMarker');
             var id = this._contextObj ? this._contextObj.getGuid() : null,
                 marker = new google.maps.Marker({
                     position: new google.maps.LatLng(obj.get(this.latAttr), obj.get(this.lngAttr)),
@@ -205,7 +193,7 @@ define([
             } else if(this.defaultIcon) {
                 markerImageURL = this.defaultIcon;
             }
-            
+
             if (markerImageURL) {
                 marker.setIcon(window.mx.appUrl + markerImageURL);
             }
@@ -219,7 +207,6 @@ define([
         },
 
         _goToContext: function () {
-            console.log(this.id + '_goToContext');
             this._removeAllMarkers();
             if (this._googleMap && this._contextObj) {
                 this._googleMap.setZoom(this.lowestZoom);
