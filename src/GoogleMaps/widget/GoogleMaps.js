@@ -211,7 +211,13 @@ define([
             if (this._googleMap && this._contextObj) {
                 this._googleMap.setZoom(this.lowestZoom);
                 this._addMarker(this._contextObj);
-                this._googleMap.panTo(new google.maps.LatLng(this._contextObj.get(this.latAttr), this._contextObj.get(this.lngAttr)));
+				
+				try {
+                	this._googleMap.panTo(new google.maps.LatLng(this._contextObj.get(this.latAttr), this._contextObj.get(this.lngAttr)));
+				}
+				catch(e) {
+					console.error('Error while panning to context coordinates: ' + e.message);	
+				}
             }
         }
     });
