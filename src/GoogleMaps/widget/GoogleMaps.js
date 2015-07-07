@@ -206,18 +206,32 @@ define([
             }
         },
 
+        _getLatLng: function (obj) {
+            var lat = obj.get(this.latAttr),
+                lng = obj.get(this.lngAttr);
+
+            if (lat === "" && lng === "") {
+                return new google.maps.LatLng(this.defaultLat, this.defaultLng);
+            } else if (!isNaN(lat) && !isNaN(lng) && lat !== "" && lng !== "") {
+                return new google.maps.LatLng(lat, lng);
+            } else {
+                return null;
+            }
+        },
+
         _goToContext: function () {
             this._removeAllMarkers();
             if (this._googleMap && this._contextObj) {
                 this._googleMap.setZoom(this.lowestZoom);
                 this._addMarker(this._contextObj);
-				
-				try {
-                	this._googleMap.panTo(new google.maps.LatLng(this._contextObj.get(this.latAttr), this._contextObj.get(this.lngAttr)));
-				}
-				catch(e) {
-					console.error('Error while panning to context coordinates: ' + e.message);	
-				}
+
+                var position = this._getLatLng(this._contextObj);
+                if (position) {
+                    this._googleMap.panTo(position);
+                } else {
+                    console.error(this.id + ": " + "Incorrect coordinates (" + this._contextObj.get(this.latAttr) +
+                                  "," + this._contextObj.get(this.lngAttr) + ")");
+                }
             }
         }
     });
