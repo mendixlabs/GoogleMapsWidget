@@ -16,6 +16,7 @@ define([
         _googleMap: null,
         _markerCache: null,
         _googleScript: null,
+        _defaultPosition: null,
 
 
         postCreate: function () {
@@ -69,9 +70,10 @@ define([
                 width: this.mapWidth
             });
 
+            this._defaultPosition = new google.maps.LatLng(this.defaultLat, this.defaultLng);
             this._googleMap = new google.maps.Map(this.mapContainer, {
                 zoom: 11,
-                center: new google.maps.LatLng(this.defaultLat, this.defaultLng),
+                center: this._defaultPosition,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 mapTypeControlOption: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
@@ -100,32 +102,49 @@ define([
 
         },
 
+        _refreshMap: function (objs) {
+            var self = this,
+                bounds = new google.maps.LatLngBounds(),
+                panPosition = self._defaultPosition,
+                validCount = 0;
+            dojoArray.forEach(objs, function (obj) {
+                self._addMarker(obj);
+
+                var position = self._getLatLng(obj);
+                if (position) {
+                    bounds.extend(position);
+                    validCount++;
+                    panPosition = position;
+                } else {
+                    console.error(self.id + ": " + "Incorrect coordinates (" + obj.get(self.latAttr) +
+                                  "," + obj.get(self.lngAttr) + ")");
+                }
+            });
+
+            if (validCount < 2) {
+                self._googleMap.setZoom(self.lowestZoom);
+                self._googleMap.panTo(panPosition);
+            } else {
+                self._googleMap.fitBounds(bounds);
+            }
+        },
+
         _fetchFromDB: function () {
-            var xpath = '//' + this.mapEntity + this.xpathConstraint,
-                cb = function (objs) {
-                    var self = this,
-                        bounds = new google.maps.LatLngBounds();
-                    dojoArray.forEach(objs, function (obj, index) {
-                        self._addMarker(obj);
-                        bounds.extend(new google.maps.LatLng(obj.get(self.latAttr), obj.get(self.lngAttr)));
-                        if (index === objs.length - 1) {
-                            self._googleMap.fitBounds(bounds);
-                        }
-                    });
-                };
+            var xpath = '//' + this.mapEntity + this.xpathConstraint;
+
             this._removeAllMarkers();
             if (this._contextObj) {
                 xpath = xpath.replace('[%CurrentObject%]', this._contextObj.getGuid());
                 mx.data.get({
                     xpath: xpath,
-                    callback: lang.hitch(this, cb)
+                    callback: lang.hitch(this, "_refreshMap")
                 });
             } else if (!this._contextObj && (xpath.indexOf('[%CurrentObject%]') > -1)) {
                 console.warn('No context for xpath, not fetching.');
             } else {
                 mx.data.get({
                     xpath: xpath,
-                    callback: lang.hitch(this, cb)
+                    callback: lang.hitch(this, "_refreshMap")
                 });
             }
         },
@@ -206,18 +225,23 @@ define([
             }
         },
 
+        _getLatLng: function (obj) {
+            var lat = obj.get(this.latAttr),
+                lng = obj.get(this.lngAttr);
+
+            if (lat === "" && lng === "") {
+                return this._defaultPosition;
+            } else if (!isNaN(lat) && !isNaN(lng) && lat !== "" && lng !== "") {
+                return new google.maps.LatLng(lat, lng);
+            } else {
+                return null;
+            }
+        },
+
         _goToContext: function () {
             this._removeAllMarkers();
             if (this._googleMap && this._contextObj) {
-                this._googleMap.setZoom(this.lowestZoom);
-                this._addMarker(this._contextObj);
-				
-				try {
-                	this._googleMap.panTo(new google.maps.LatLng(this._contextObj.get(this.latAttr), this._contextObj.get(this.lngAttr)));
-				}
-				catch(e) {
-					console.error('Error while panning to context coordinates: ' + e.message);	
-				}
+                this._refreshMap([ this._contextObj ]);
             }
         }
     });
