@@ -102,44 +102,49 @@ define([
 
         },
 
+        _refreshMap: function (objs) {
+            var self = this,
+                bounds = new google.maps.LatLngBounds(),
+                panPosition = self._defaultPosition,
+                validCount = 0;
+            dojoArray.forEach(objs, function (obj) {
+                self._addMarker(obj);
+
+                var position = self._getLatLng(obj);
+                if (position) {
+                    bounds.extend(position);
+                    validCount++;
+                    panPosition = position;
+                } else {
+                    console.error(self.id + ": " + "Incorrect coordinates (" + obj.get(self.latAttr) +
+                                  "," + obj.get(self.lngAttr) + ")");
+                }
+            });
+
+            if (validCount < 2) {
+                self._googleMap.setZoom(self.lowestZoom);
+                self._googleMap.panTo(panPosition);
+            } else {
+                self._googleMap.fitBounds(bounds);
+            }
+        },
+
         _fetchFromDB: function () {
-            var xpath = '//' + this.mapEntity + this.xpathConstraint,
-                cb = function (objs) {
-                    var self = this,
-                        bounds = new google.maps.LatLngBounds(),
-                        panPosition = self._defaultPosition,
-                        validCount = 0;
-                    dojoArray.forEach(objs, function (obj) {
-                        self._addMarker(obj);
+            var xpath = '//' + this.mapEntity + this.xpathConstraint;
 
-                        var position = self._getLatLng(obj);
-                        if (position) {
-                            bounds.extend(position);
-                            validCount++;
-                            panPosition = position;
-                        }
-                    });
-
-                    if (validCount < 2) {
-                        self._googleMap.setZoom(self.lowestZoom);
-                        self._googleMap.panTo(panPosition);
-                    } else {
-                        self._googleMap.fitBounds(bounds);
-                    }
-                };
             this._removeAllMarkers();
             if (this._contextObj) {
                 xpath = xpath.replace('[%CurrentObject%]', this._contextObj.getGuid());
                 mx.data.get({
                     xpath: xpath,
-                    callback: lang.hitch(this, cb)
+                    callback: lang.hitch(this, "_refreshMap")
                 });
             } else if (!this._contextObj && (xpath.indexOf('[%CurrentObject%]') > -1)) {
                 console.warn('No context for xpath, not fetching.');
             } else {
                 mx.data.get({
                     xpath: xpath,
-                    callback: lang.hitch(this, cb)
+                    callback: lang.hitch(this, "_refreshMap")
                 });
             }
         },
@@ -236,16 +241,7 @@ define([
         _goToContext: function () {
             this._removeAllMarkers();
             if (this._googleMap && this._contextObj) {
-                this._googleMap.setZoom(this.lowestZoom);
-                this._addMarker(this._contextObj);
-
-                var position = this._getLatLng(this._contextObj);
-                if (position) {
-                    this._googleMap.panTo(position);
-                } else {
-                    console.error(this.id + ": " + "Incorrect coordinates (" + this._contextObj.get(this.latAttr) +
-                                  "," + this._contextObj.get(this.lngAttr) + ")");
-                }
+                this._refreshMap([ this._contextObj ]);
             }
         }
     });
