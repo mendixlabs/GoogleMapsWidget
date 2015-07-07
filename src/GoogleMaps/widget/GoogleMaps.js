@@ -106,14 +106,26 @@ define([
             var xpath = '//' + this.mapEntity + this.xpathConstraint,
                 cb = function (objs) {
                     var self = this,
-                        bounds = new google.maps.LatLngBounds();
-                    dojoArray.forEach(objs, function (obj, index) {
+                        bounds = new google.maps.LatLngBounds(),
+                        panPosition = self._defaultPosition,
+                        validCount = 0;
+                    dojoArray.forEach(objs, function (obj) {
                         self._addMarker(obj);
-                        bounds.extend(new google.maps.LatLng(obj.get(self.latAttr), obj.get(self.lngAttr)));
-                        if (index === objs.length - 1) {
-                            self._googleMap.fitBounds(bounds);
+
+                        var position = self._getLatLng(obj);
+                        if (position) {
+                            bounds.extend(position);
+                            validCount++;
+                            panPosition = position;
                         }
                     });
+
+                    if (validCount < 2) {
+                        self._googleMap.setZoom(self.lowestZoom);
+                        self._googleMap.panTo(panPosition);
+                    } else {
+                        self._googleMap.fitBounds(bounds);
+                    }
                 };
             this._removeAllMarkers();
             if (this._contextObj) {
