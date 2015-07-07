@@ -16,6 +16,7 @@ define([
         _googleMap: null,
         _markerCache: null,
         _googleScript: null,
+        _defaultPosition: null,
 
 
         postCreate: function () {
@@ -69,9 +70,10 @@ define([
                 width: this.mapWidth
             });
 
+            this._defaultPosition = new google.maps.LatLng(this.defaultLat, this.defaultLng);
             this._googleMap = new google.maps.Map(this.mapContainer, {
                 zoom: 11,
-                center: new google.maps.LatLng(this.defaultLat, this.defaultLng),
+                center: this._defaultPosition,
                 mapTypeId: google.maps.MapTypeId.ROADMAP,
                 mapTypeControlOption: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
@@ -211,7 +213,7 @@ define([
                 lng = obj.get(this.lngAttr);
 
             if (lat === "" && lng === "") {
-                return new google.maps.LatLng(this.defaultLat, this.defaultLng);
+                return this._defaultPosition;
             } else if (!isNaN(lat) && !isNaN(lng) && lat !== "" && lng !== "") {
                 return new google.maps.LatLng(lat, lng);
             } else {
