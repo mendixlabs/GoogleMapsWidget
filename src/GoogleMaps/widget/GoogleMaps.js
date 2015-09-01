@@ -33,6 +33,7 @@ define([
             this._resetSubscriptions();
             if (this._googleMap) {
                 this._fetchMarkers();
+                google.maps.event.trigger(this._googleMap, 'resize');
             }
 
             callback();
