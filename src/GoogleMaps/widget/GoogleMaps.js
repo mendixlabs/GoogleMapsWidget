@@ -117,8 +117,8 @@ define([
                     validCount++;
                     panPosition = position;
                 } else {
-                    console.error(self.id + ": " + "Incorrect coordinates (" + obj.get(self.latAttr) +
-                                  "," + obj.get(self.lngAttr) + ")");
+                    console.error(self.id + ": " + "Incorrect coordinates (" + this.checkAttrForDecimal(obj, this.latAttr) +
+                                  "," + this.checkAttrForDecimal(obj, this.lngAttr) + ")");
                 }
             });
 
@@ -188,14 +188,21 @@ define([
 
         _addMarker: function (obj) {
             var id = this._contextObj ? this._contextObj.getGuid() : null,
-                marker = new google.maps.Marker({
-                    position: new google.maps.LatLng(obj.get(this.latAttr), obj.get(this.lngAttr)),
-                    map: this._googleMap
-                }),
+                marker = null,
+				lat = 0,
+				lng = 0,
                 self = this,
                 markerImageURL = null,
                 url = null;
-
+			
+			lat = this.checkAttrForDecimal(obj, this.latAttr);
+			lng = this.checkAttrForDecimal(obj, this.lngAttr);
+				
+			marker = new google.maps.Marker({
+				position: new google.maps.LatLng(lat, lng),
+				map: this._googleMap
+			});
+			
             if (id) {
                 marker.id = id;
             }
@@ -225,11 +232,19 @@ define([
                 this._markerCache.push(marker);
             }
         },
+		
+		checkAttrForDecimal: function (obj, attr) {
+			if (obj.getAttributeType(attr) == "Decimal") {
+				return obj.get(attr).toFixed(5);
+			} else {
+				return obj.get(attr);
+			}
+		},
 
         _getLatLng: function (obj) {
-            var lat = obj.get(this.latAttr),
-                lng = obj.get(this.lngAttr);
-
+            var lat = this.checkAttrForDecimal(obj, this.latAttr),
+                lng = this.checkAttrForDecimal(obj, this.lngAttr);
+			
             if (lat === "" && lng === "") {
                 return this._defaultPosition;
             } else if (!isNaN(lat) && !isNaN(lng) && lat !== "" && lng !== "") {
