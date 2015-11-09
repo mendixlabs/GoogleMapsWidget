@@ -4,8 +4,8 @@
 define([
     'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
     'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang',
-    'GoogleMaps/lib/googlemaps!', 'dojo/text!GoogleMaps/widget/template/GoogleMaps.html'
-], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, googleMaps, widgetTemplate) {
+    'dojo/text!GoogleMaps/widget/template/GoogleMaps.html', '//www.google.com/jsapi'
+], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, widgetTemplate) {
     'use strict';
 
     return declare('GoogleMaps.widget.GoogleMaps', [_WidgetBase, _TemplatedMixin], {
@@ -20,11 +20,18 @@ define([
 
 
         postCreate: function () {
-            window[this.id + "_mapsCallback"] = lang.hitch(this, function () {
+            if (google && !google.maps) {
+                var params = "sensor=true";
+                if (this.apiAccessKey !== "") {
+                    params += "&key=" + this.apiAccessKey;
+                }
+                google.load("maps", 3, {
+                    other_params: params,
+                    callback: lang.hitch(this, this._loadMap)
+                });
+            } else if (google && google.maps) {
                 this._loadMap();
-            });
-
-            this._loadMap();
+            }
         },
 
         update: function (obj, callback) {
@@ -46,7 +53,6 @@ define([
         },
 
         uninitialize: function () {
-            window[this.id + "_mapsCallback"] = null;
         },
 
         _resetSubscriptions: function () {
@@ -234,7 +240,7 @@ define([
         },
 		
 		checkAttrForDecimal: function (obj, attr) {
-			if (obj.getAttributeType(attr) == "Decimal") {
+			if (obj.getAttributeType(attr) === "Decimal") {
 				return obj.get(attr).toFixed(5);
 			} else {
 				return obj.get(attr);
@@ -263,4 +269,6 @@ define([
     });
 });
 
-require(["GoogleMaps/widget/GoogleMaps"], function() {});
+require(["GoogleMaps/widget/GoogleMaps"], function() {
+    'use strict';    
+});
