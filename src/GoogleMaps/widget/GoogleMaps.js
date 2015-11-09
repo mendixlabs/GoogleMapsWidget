@@ -2,10 +2,16 @@
 /*global mx, define, require, browser, devel, console, google, window */
 
 define([
-    'dojo/_base/declare', 'mxui/widget/_WidgetBase', 'dijit/_TemplatedMixin',
-    'dojo/dom-style', 'dojo/dom-construct', 'dojo/_base/array', 'dojo/_base/lang',
-    'GoogleMaps/lib/googlemaps!', 'dojo/text!GoogleMaps/widget/template/GoogleMaps.html'
-], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, googleMaps, widgetTemplate) {
+    'dojo/_base/declare', 
+    'mxui/widget/_WidgetBase', 
+    'dijit/_TemplatedMixin',
+    'dojo/dom-style', 
+    'dojo/dom-construct', 
+    'dojo/_base/array', 
+    'dojo/_base/lang',
+    'dojo/text!GoogleMaps/widget/template/GoogleMaps.html',
+    'GoogleMaps/lib/jsapi'
+], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, widgetTemplate) {
     'use strict';
 
     return declare('GoogleMaps.widget.GoogleMaps', [_WidgetBase, _TemplatedMixin], {
@@ -18,13 +24,19 @@ define([
         _googleScript: null,
         _defaultPosition: null,
 
-
         postCreate: function () {
-            window[this.id + "_mapsCallback"] = lang.hitch(this, function () {
+            if (google && !google.maps) {
+                var params = "";
+                if (this.apiAccessKey !== "") {
+                    params = "key=" + this.apiAccessKey;
+                }
+                google.load("maps", 3, {
+                    other_params: params,
+                    callback: lang.hitch(this, this._loadMap)
+                });
+            } else if (google && google.maps) {
                 this._loadMap();
-            });
-
-            this._loadMap();
+            }
         },
 
         update: function (obj, callback) {
@@ -43,10 +55,6 @@ define([
             if (this._googleMap) {
                 google.maps.event.trigger(this._googleMap, 'resize');
             }
-        },
-
-        uninitialize: function () {
-            window[this.id + "_mapsCallback"] = null;
         },
 
         _resetSubscriptions: function () {
@@ -90,7 +98,6 @@ define([
                 this._goToContext();
             } else {
                 if (this.updateRefresh) {
-
                     this._fetchFromDB();
                 } else {
                     if (this._markerCache) {
@@ -100,7 +107,6 @@ define([
                     }
                 }
             }
-
         },
 
         _refreshMap: function (objs) {
@@ -189,20 +195,20 @@ define([
         _addMarker: function (obj) {
             var id = this._contextObj ? this._contextObj.getGuid() : null,
                 marker = null,
-				lat = 0,
-				lng = 0,
+                lat = 0,
+                lng = 0,
                 self = this,
                 markerImageURL = null,
                 url = null;
-			
-			lat = this.checkAttrForDecimal(obj, this.latAttr);
-			lng = this.checkAttrForDecimal(obj, this.lngAttr);
-				
-			marker = new google.maps.Marker({
-				position: new google.maps.LatLng(lat, lng),
-				map: this._googleMap
-			});
-			
+            
+            lat = this.checkAttrForDecimal(obj, this.latAttr);
+            lng = this.checkAttrForDecimal(obj, this.lngAttr);
+                
+            marker = new google.maps.Marker({
+                position: new google.maps.LatLng(lat, lng),
+                map: this._googleMap
+            });
+            
             if (id) {
                 marker.id = id;
             }
@@ -232,19 +238,19 @@ define([
                 this._markerCache.push(marker);
             }
         },
-		
-		checkAttrForDecimal: function (obj, attr) {
-			if (obj.getAttributeType(attr) == "Decimal") {
-				return obj.get(attr).toFixed(5);
-			} else {
-				return obj.get(attr);
-			}
-		},
+
+        checkAttrForDecimal: function (obj, attr) {
+            if (obj.getAttributeType(attr) == "Decimal") {
+                return obj.get(attr).toFixed(5);
+            } else {
+                return obj.get(attr);
+            }
+        },
 
         _getLatLng: function (obj) {
             var lat = this.checkAttrForDecimal(obj, this.latAttr),
                 lng = this.checkAttrForDecimal(obj, this.lngAttr);
-			
+
             if (lat === "" && lng === "") {
                 return this._defaultPosition;
             } else if (!isNaN(lat) && !isNaN(lng) && lat !== "" && lng !== "") {
