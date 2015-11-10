@@ -83,7 +83,7 @@ define([
             this._googleMap = new google.maps.Map(this.mapContainer, {
                 zoom: 11,
                 center: this._defaultPosition,
-                mapTypeId: google.maps.MapTypeId.ROADMAP,
+                mapTypeId: google.maps.MapTypeId[this.defaultMapType] || google.maps.MapTypeId.ROADMAP,
                 mapTypeControlOption: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
                 }
@@ -200,15 +200,15 @@ define([
                 self = this,
                 markerImageURL = null,
                 url = null;
-            
+
             lat = this.checkAttrForDecimal(obj, this.latAttr);
             lng = this.checkAttrForDecimal(obj, this.lngAttr);
-                
+
             marker = new google.maps.Marker({
                 position: new google.maps.LatLng(lat, lng),
                 map: this._googleMap
             });
-            
+
             if (id) {
                 marker.id = id;
             }
@@ -234,6 +234,7 @@ define([
             if (!this._markerCache) {
                 this._markerCache = [];
             }
+
             if (dojoArray.indexOf(this._markerCache, marker) === -1) {
                 this._markerCache.push(marker);
             }

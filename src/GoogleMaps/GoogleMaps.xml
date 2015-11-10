@@ -72,6 +72,17 @@
             <category>Behavior</category>
             <description>Default longitude for the map to start at.</description> 
         </property>
+        <property key="defaultMapType" type="enumeration" defaultValue="ROADMAP">
+            <caption>Maptype</caption>
+            <category>Appearance</category>
+            <description>Set the default map type</description>
+            <enumerationValues>
+                <enumerationValue key="ROADMAP">Roadmap</enumerationValue>
+                <enumerationValue key="SATELLITE">Satellite</enumerationValue>
+                <enumerationValue key="HYBRID">Hybrid</enumerationValue>
+                <enumerationValue key="TERRAIN">Terrain</enumerationValue>
+            </enumerationValues>
+        </property>
         <property key="lowestZoom" type="integer" defaultValue="15">
             <caption>Single item zoom level</caption>
             <category>Behavior</category>
