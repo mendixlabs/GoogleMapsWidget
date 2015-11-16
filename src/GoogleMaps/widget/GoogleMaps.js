@@ -26,10 +26,7 @@ define([
 
         postCreate: function () {
             if (google && !google.maps) {
-                var params = "";
-                if (this.apiAccessKey !== "") {
-                    params = "key=" + this.apiAccessKey;
-                }
+                var params = (this.apiAccessKey !== "") ? "key=" + this.ApiAccessKey : "";
                 if (google.loader && google.loader.Secure === false) {
                     google.loader.Secure = true;
                 }
@@ -244,7 +241,7 @@ define([
         },
 
         checkAttrForDecimal: function (obj, attr) {
-            if (obj.getAttributeType(attr) == "Decimal") {
+            if (obj.get(attr) == "Decimal") {
                 return obj.get(attr).toFixed(5);
             } else {
                 return obj.get(attr);
