@@ -2,19 +2,19 @@
 /*global mx, define, require, browser, devel, console, google, window */
 
 define([
-    'dojo/_base/declare', 
-    'mxui/widget/_WidgetBase', 
-    'dijit/_TemplatedMixin',
-    'dojo/dom-style', 
-    'dojo/dom-construct', 
-    'dojo/_base/array', 
-    'dojo/_base/lang',
-    'dojo/text!GoogleMaps/widget/template/GoogleMaps.html',
-    'GoogleMaps/lib/jsapi'
+    "dojo/_base/declare",
+    "mxui/widget/_WidgetBase",
+    "dijit/_TemplatedMixin",
+    "dojo/dom-style",
+    "dojo/dom-construct",
+    "dojo/_base/array",
+    "dojo/_base/lang",
+    "dojo/text!GoogleMaps/widget/template/GoogleMaps.html",
+    "GoogleMaps/lib/jsapi"
 ], function (declare, _WidgetBase, _TemplatedMixin, domStyle, domConstruct, dojoArray, lang, widgetTemplate) {
-    'use strict';
+    "use strict";
 
-    return declare('GoogleMaps.widget.GoogleMaps', [_WidgetBase, _TemplatedMixin], {
+    return declare("GoogleMaps.widget.GoogleMaps", [_WidgetBase, _TemplatedMixin], {
         templateString: widgetTemplate,
 
         _handle: null,
@@ -45,7 +45,7 @@ define([
             this._resetSubscriptions();
             if (this._googleMap) {
                 this._fetchMarkers();
-                google.maps.event.trigger(this._googleMap, 'resize');
+                google.maps.event.trigger(this._googleMap, "resize");
             }
 
             callback();
@@ -53,7 +53,7 @@ define([
 
         resize: function (box) {
             if (this._googleMap) {
-                google.maps.event.trigger(this._googleMap, 'resize');
+                google.maps.event.trigger(this._googleMap, "resize");
             }
         },
 
@@ -75,7 +75,7 @@ define([
 
         _loadMap: function () {
             domStyle.set(this.mapContainer, {
-                height: this.mapHeight + 'px',
+                height: this.mapHeight + "px",
                 width: this.mapWidth
             });
 
@@ -137,17 +137,17 @@ define([
         },
 
         _fetchFromDB: function () {
-            var xpath = '//' + this.mapEntity + this.xpathConstraint;
+            var xpath = "//" + this.mapEntity + this.xpathConstraint;
 
             this._removeAllMarkers();
             if (this._contextObj) {
-                xpath = xpath.replace('[%CurrentObject%]', this._contextObj.getGuid());
+                xpath = xpath.replace("[%CurrentObject%]", this._contextObj.getGuid());
                 mx.data.get({
                     xpath: xpath,
                     callback: lang.hitch(this, "_refreshMap")
                 });
-            } else if (!this._contextObj && (xpath.indexOf('[%CurrentObject%]') > -1)) {
-                console.warn('No context for xpath, not fetching.');
+            } else if (!this._contextObj && (xpath.indexOf("[%CurrentObject%]") > -1)) {
+                console.warn("No context for xpath, not fetching.");
             } else {
                 mx.data.get({
                     xpath: xpath,
@@ -241,7 +241,7 @@ define([
         },
 
         checkAttrForDecimal: function (obj, attr) {
-            if (obj.get(attr) == "Decimal") {
+            if (obj.get(attr) === "Decimal") {
                 return obj.get(attr).toFixed(5);
             } else {
                 return obj.get(attr);
