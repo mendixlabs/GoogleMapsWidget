@@ -100,14 +100,19 @@ define([
             });
 
             this._defaultPosition = new google.maps.LatLng(this.defaultLat, this.defaultLng);
-            this._googleMap = new google.maps.Map(this.mapContainer, {
+			var mapOptions = {
                 zoom: 11,
                 center: this._defaultPosition,
                 mapTypeId: google.maps.MapTypeId[this.defaultMapType] || google.maps.MapTypeId.ROADMAP,
                 mapTypeControlOption: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
                 }
-            });
+			};
+			if(this.styleArray != ''){
+				mapOptions.styles = JSON.parse(this.styleArray);
+			}
+			
+            this._googleMap = new google.maps.Map(this.mapContainer, mapOptions);
 
             this._fetchMarkers(callback);
         },
