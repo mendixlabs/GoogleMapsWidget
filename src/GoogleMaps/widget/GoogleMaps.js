@@ -90,6 +90,15 @@ define([
                     })
                 });
             }
+            else {
+                this._handle = this.subscribe({
+                    entity: this.mapEntity,
+                    callback: lang.hitch(this, function (entity) {
+                        this._fetchMarkers();
+                    })
+                });
+
+            }
         },
 
         _loadMap: function (callback) {
