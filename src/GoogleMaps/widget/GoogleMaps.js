@@ -42,8 +42,6 @@ define([
 
             if (!google.maps) {
                 logger.debug(this.id + ".update load Google maps");
-                console.log(this.apiAccessKey);
-
                 var params = (this.apiAccessKey !== "") ? "key=" + this.apiAccessKey : "";
                 if (google.loader && google.loader.Secure === false) {
                     google.loader.Secure = true;
