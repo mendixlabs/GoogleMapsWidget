@@ -42,7 +42,9 @@ define([
 
             if (!google.maps) {
                 logger.debug(this.id + ".update load Google maps");
-                var params = (this.apiAccessKey !== "") ? "key=" + this.ApiAccessKey : "";
+                console.log(this.apiAccessKey);
+
+                var params = (this.apiAccessKey !== "") ? "key=" + this.apiAccessKey : "";
                 if (google.loader && google.loader.Secure === false) {
                     google.loader.Secure = true;
                 }
@@ -120,7 +122,7 @@ define([
 			if(this.styleArray != ''){
 				mapOptions.styles = JSON.parse(this.styleArray);
 			}
-			
+
             this._googleMap = new google.maps.Map(this.mapContainer, mapOptions);
 
             this._fetchMarkers(callback);
