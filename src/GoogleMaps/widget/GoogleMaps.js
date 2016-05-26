@@ -24,8 +24,10 @@ define([
         _googleScript: null,
         _defaultPosition: null,
 
+        _latlngObjs: [],
+        _resizeTimer: null,
+
         postCreate: function () {
-            //logger.level(logger.DEBUG);
             logger.debug(this.id + ".postCreate");
         },
 
@@ -66,9 +68,19 @@ define([
         },
 
         resize: function (box) {
-            logger.debug(this.id + ".resize");
             if (this._googleMap) {
-                google.maps.event.trigger(this._googleMap, "resize");
+                if (this._resizeTimer) {
+                    clearTimeout(this._resizeTimer);
+                }
+                this._resizeTimer = setTimeout(lang.hitch(this, function () {
+                    logger.debug(this.id + ".resize");
+                    google.maps.event.trigger(this._googleMap, "resize");
+                    // TODO: Problem in a TabContainer is that it will not move to context if set. This can be solved by adding the next lines,
+                    // but this will result in jumping back to the previous position when resizing in general.
+                    // if (this.gotocontext) {
+                    //     this._goToContext();
+                    // }
+                }), 250);
             }
         },
 
@@ -76,14 +88,14 @@ define([
             logger.debug(this.id + "._resetSubscriptions");
 
             if (this._handle) {
-                logger.debug(this.id + "._resetSubscriptions unsubscribe", this._handle);
-                this.unsubscribe(this._handle);
+                logger.debug(this.id + "._resetSubscriptions unsubscribe");
+                mx.data.unsubscribe(this._handle);
                 this._handle = null;
             }
 
             if (this._contextObj) {
                 logger.debug(this.id + "._resetSubscriptions subscribe", this._contextObj.getGuid());
-                this._handle = this.subscribe({
+                this._handle = mx.data.subscribe({
                     guid: this._contextObj.getGuid(),
                     callback: lang.hitch(this, function (guid) {
                         this._fetchMarkers();
@@ -91,7 +103,7 @@ define([
                 });
             }
             else {
-                this._handle = this.subscribe({
+                this._handle = mx.data.subscribe({
                     entity: this.mapEntity,
                     callback: lang.hitch(this, function (entity) {
                         this._fetchMarkers();
@@ -117,7 +129,7 @@ define([
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
                 }
 			};
-			if(this.styleArray != ''){
+			if (this.styleArray !== ""){
 				mapOptions.styles = JSON.parse(this.styleArray);
 			}
 
@@ -149,29 +161,67 @@ define([
                 panPosition = this._defaultPosition,
                 validCount = 0;
 
-            dojoArray.forEach(objs, lang.hitch(this, function (obj) {
-                this._addMarker(obj);
+            this._createLatLngObjs(objs, [], lang.hitch(this, function (latlngObjs) {
+                this._latlngObjs = latlngObjs;
 
-                var position = this._getLatLng(obj);
-                if (position) {
-                    bounds.extend(position);
-                    validCount++;
-                    panPosition = position;
+                dojoArray.forEach(this._latlngObjs, lang.hitch(this, function (obj) {
+                    this._addMarker(obj);
+
+                    var position = this._getLatLng(obj);
+                    if (position) {
+                        bounds.extend(position);
+                        validCount++;
+                        panPosition = position;
+                    } else {
+                        logger.error(this.id + ": " + "Incorrect coordinates (" + this.checkAttrForDecimal(obj, this.latAttr) +
+                                      "," + this.checkAttrForDecimal(obj, this.lngAttr) + ")");
+                    }
+                }));
+
+                if (validCount < 2) {
+                    this._googleMap.setZoom(this.lowestZoom);
+                    this._googleMap.panTo(panPosition);
                 } else {
-                    logger.error(this.id + ": " + "Incorrect coordinates (" + this.checkAttrForDecimal(obj, this.latAttr) +
-                                  "," + this.checkAttrForDecimal(obj, this.lngAttr) + ")");
+                    this._googleMap.fitBounds(bounds);
                 }
+
+                mendix.lang.nullExec(callback);
             }));
+        },
 
-            if (validCount < 2) {
-                this._googleMap.setZoom(this.lowestZoom);
-                this._googleMap.panTo(panPosition);
+        _createLatLngObjs: function (objs, latlngs, callback) {
+            // _createLatLngObjs is a recursive function. It tries to get the lat en lng of an object and passes the list of objects (minus the first) to itself
+            logger.debug(this.id + "._createLatLngObjs: todo:" + objs.length + "/done:" + latlngs.length);
+            if (objs.length === 0) {
+                callback(latlngs);
             } else {
-                this._googleMap.fitBounds(bounds);
-            }
+                var obj = objs.pop(),
+                    latlngObj = {
+                        mxObj: obj
+                    };
 
-            if (typeof callback === "function") {
-                callback();
+                obj.fetch(this.latAttr, lang.hitch(this, function (lat) { // We do a fetch so we can get attributes over association
+                    if (lat === null || lat === "") {
+                        this._createLatLngObjs(objs, latlngs, callback);
+                    } else {
+                        if (typeof lat === "object") { // Big
+                            lat = lat.toString();
+                        }
+                        latlngObj.lat = parseFloat(lat);
+                        obj.fetch(this.lngAttr, lang.hitch(this, function (lng) {
+                            if (lng === null || lng === "") {
+                                this._createLatLngObjs(objs, latlngs, callback);
+                            } else {
+                                if (typeof lat === "object") { // Big
+                                    lat = lat.toString();
+                                }
+                                latlngObj.lng = parseFloat(lng);
+                                latlngs.push(latlngObj);
+                                this._createLatLngObjs(objs, latlngs, callback);
+                            }
+                        }));
+                    }
+                }));
             }
         },
 
@@ -190,9 +240,7 @@ define([
                 });
             } else if (!this._contextObj && (xpath.indexOf("[%CurrentObject%]") > -1)) {
                 console.warn("No context for xpath, not fetching.");
-                if (typeof callback === "function") {
-                    callback();
-                }
+                mendix.lang.nullExec(callback);
             } else {
                 mx.data.get({
                     xpath: xpath,
@@ -227,8 +275,8 @@ define([
 
             if (!cached) {
                 this._fetchFromDB(callback);
-            } else if (typeof callback === "function") {
-                callback();
+            } else {
+                mendix.lang.nullExec(callback);
             }
         },
 
@@ -245,13 +293,10 @@ define([
             logger.debug(this.id + "._addMarker");
             var id = this._contextObj ? this._contextObj.getGuid() : null,
                 marker = null,
-                lat = 0,
-                lng = 0,
+                lat = obj.lat,
+                lng = obj.lng,
                 markerImageURL = null,
                 url = null;
-
-            lat = this.checkAttrForDecimal(obj, this.latAttr);
-            lng = this.checkAttrForDecimal(obj, this.lngAttr);
 
             marker = new google.maps.Marker({
                 position: new google.maps.LatLng(lat, lng),
@@ -263,12 +308,12 @@ define([
             }
 
             if (this.markerDisplayAttr) {
-                marker.setTitle(obj.get(this.markerDisplayAttr));
+                marker.setTitle(obj.mxObj.get(this.markerDisplayAttr));
             }
 
             if (this.markerImages.length > 1) {
                 dojoArray.forEach(this.markerImages, lang.hitch(this, function (imageObj) {
-                    if (imageObj.enumKey === obj.get(this.enumAttr)) {
+                    if (imageObj.enumKey === obj.mxObj.get(this.enumAttr)) {
                         markerImageURL = imageObj.enumImage;
                     }
                 }));
@@ -289,19 +334,10 @@ define([
             }
         },
 
-        checkAttrForDecimal: function (obj, attr) {
-            logger.debug(this.id + ".checkAttrForDecimal");
-            if (obj.get(attr) === "Decimal") {
-                return obj.get(attr).toFixed(5);
-            } else {
-                return obj.get(attr);
-            }
-        },
-
         _getLatLng: function (obj) {
             logger.debug(this.id + "._getLatLng");
-            var lat = this.checkAttrForDecimal(obj, this.latAttr),
-                lng = this.checkAttrForDecimal(obj, this.lngAttr);
+            var lat = obj.lat,
+                lng = obj.lng;
 
             if (lat === "" && lng === "") {
                 return this._defaultPosition;
@@ -317,11 +353,11 @@ define([
             this._removeAllMarkers();
             if (this._googleMap && this._contextObj) {
                 this._refreshMap([ this._contextObj ], callback);
-            } else if (typeof callback === "function") {
-                callback();
+            } else {
+                mendix.lang.nullExec(callback);
             }
         }
     });
 });
 
-require(["GoogleMaps/widget/GoogleMaps"], function() {});
+require(["GoogleMaps/widget/GoogleMaps"]);
