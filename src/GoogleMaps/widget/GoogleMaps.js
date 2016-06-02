@@ -216,6 +216,7 @@ define([
                                     lat = lat.toString();
                                 }
                                 latlngObj.lng = parseFloat(lng);
+
                                 latlngs.push(latlngObj);
                                 this._createLatLngObjs(objs, latlngs, callback);
                             }
@@ -308,21 +309,23 @@ define([
             }
 
             if (this.markerDisplayAttr) {
-                marker.setTitle(obj.mxObj.get(this.markerDisplayAttr));
+                obj.mxObj.fetch(this.markerDisplayAttr, function (value) {
+                    marker.setTitle(value);
+                });
             }
 
-            if (this.markerImages.length > 1) {
-                dojoArray.forEach(this.markerImages, lang.hitch(this, function (imageObj) {
-                    if (imageObj.enumKey === obj.mxObj.get(this.enumAttr)) {
-                        markerImageURL = imageObj.enumImage;
+            if (this.markerImages.length > 1 && this.enumAttr) {
+                obj.mxObj.fetch(this.enumAttr, lang.hitch(this, function (enumeration) {
+                    if (enumeration) {
+                        dojoArray.forEach(this.markerImages, lang.hitch(this, function (imageObj) {
+                            if (imageObj.enumKey === enumeration) {
+                                marker.setIcon(window.mx.appUrl +  imageObj.enumImage);
+                            }
+                        }));
                     }
                 }));
-            } else if(this.defaultIcon) {
-                markerImageURL = this.defaultIcon;
-            }
-
-            if (markerImageURL) {
-                marker.setIcon(window.mx.appUrl + markerImageURL);
+            } else if (this.defaultIcon) {
+                marker.setIcon(window.mx.appUrl +  this.defaultIcon);
             }
 
             if (!this._markerCache) {
