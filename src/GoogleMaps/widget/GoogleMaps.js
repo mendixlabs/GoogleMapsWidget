@@ -24,6 +24,8 @@ define([
         _googleScript: null,
         _defaultPosition: null,
 
+        _progressID: null,
+
         _latlngObjs: [],
         _resizeTimer: null,
 
@@ -135,7 +137,9 @@ define([
 
             this._googleMap = new google.maps.Map(this.mapContainer, mapOptions);
 
-            this._fetchMarkers(callback);
+            this._fetchMarkers();
+
+            mendix.lang.nullExec(callback);
         },
 
         _fetchMarkers: function (callback) {
@@ -161,7 +165,17 @@ define([
                 panPosition = this._defaultPosition,
                 validCount = 0;
 
+            if (this.showProgress) {
+                this._progressID = mx.ui.showProgress(this.progressMessage);
+            }
+
             this._createLatLngObjs(objs, [], lang.hitch(this, function (latlngObjs) {
+
+                if (this._progressID) {
+                    mx.ui.hideProgress(this._progressID);
+                    this._progressID = null;
+                }
+
                 this._latlngObjs = latlngObjs;
 
                 dojoArray.forEach(this._latlngObjs, lang.hitch(this, function (obj) {

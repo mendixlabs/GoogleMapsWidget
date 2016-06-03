@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <widget id="GoogleMaps.widget.GoogleMaps" needsEntityContext="false" xmlns="http://www.mendix.com/widget/1.0/">
-  <name>Google Maps</name>
+    <name>Google Maps</name>
     <description>Google Maps Overview.</description>
     <icon>
-    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
+        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
     </icon>
     <properties>
         <property key="apiAccessKey" type="string" required="false">
@@ -37,7 +37,7 @@
         <property key="xpathConstraint" type="entityConstraint" entityProperty="mapEntity" required="false">
             <caption>XPath Constraint</caption>
             <category>Data source</category>
-            <description>The XPath constraint on the objects.</description> 
+            <description>The XPath constraint on the objects.</description>
         </property>
         <property key="gotocontext" type="boolean" defaultValue="false">
             <caption>Pan to context</caption>
@@ -49,28 +49,28 @@
             <category>Data source</category>
             <description>The attribute that will be displayed in the marker info bubble. (Not required)</description>
             <attributeTypes>
-                <attributeType name="String"/> 
+                <attributeType name="String"/>
             </attributeTypes>
         </property>
         <property key="mapHeight" type="integer" defaultValue="350">
             <caption>Height</caption>
             <category>Appearance</category>
-            <description>The map's height in px.</description> 
+            <description>The map's height in px.</description>
         </property>
         <property key="mapWidth" type="string" defaultValue="100%">
             <caption>Width</caption>
             <category>Appearance</category>
-            <description>The map's width in px or percent.</description> 
+            <description>The map's width in px or percent.</description>
         </property>
         <property key="defaultLat" type="string" defaultValue="0.0">
             <caption>Default latitude</caption>
             <category>Behavior</category>
-            <description>Default latitude for the map to start at.</description> 
+            <description>Default latitude for the map to start at.</description>
         </property>
         <property key="defaultLng" type="string" defaultValue="0.0">
             <caption>Default longitude</caption>
             <category>Behavior</category>
-            <description>Default longitude for the map to start at.</description> 
+            <description>Default longitude for the map to start at.</description>
         </property>
         <property key="defaultMapType" type="enumeration" defaultValue="ROADMAP">
             <caption>Maptype</caption>
@@ -86,12 +86,12 @@
         <property key="lowestZoom" type="integer" defaultValue="15">
             <caption>Single item zoom level</caption>
             <category>Behavior</category>
-            <description>The zoom level used when displaying a single item. 1 is the whole world, 15 is city level, 20 is house level.</description> 
+            <description>The zoom level used when displaying a single item. 1 is the whole world, 15 is city level, 20 is house level.</description>
         </property>
         <property key="updateRefresh" type="boolean" defaultValue="false">
             <caption>Refresh on entity changes</caption>
             <category>Behavior</category>
-            <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description> 
+            <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description>
         </property>
         <property key="latAttr" type="attribute" entityProperty="mapEntity" required="true" isPath="optional" pathType="reference">
             <caption>Latitude attribute</caption>
@@ -100,8 +100,8 @@
             <attributeTypes>
                 <attributeType name="Integer"/>
                 <attributeType name="Float"/>
-				<attributeType name="Decimal"/>
-				<attributeType name="String"/>
+                <attributeType name="Decimal"/>
+                <attributeType name="String"/>
             </attributeTypes>
         </property>
         <property key="lngAttr" type="attribute" entityProperty="mapEntity" required="true" isPath="optional" pathType="reference">
@@ -111,8 +111,8 @@
             <attributeTypes>
                 <attributeType name="Integer"/>
                 <attributeType name="Float"/>
-				<attributeType name="Decimal"/>
-				<attributeType name="String"/>
+                <attributeType name="Decimal"/>
+                <attributeType name="String"/>
             </attributeTypes>
         </property>
         <property key="enumAttr" type="attribute" entityProperty="mapEntity" required="false" isPath="optional" pathType="reference">
@@ -145,13 +145,23 @@
                 </property>
             </properties>
         </property>
-		
-		<property key="styleArray" type="string" multiline="true" required="false">
+
+        <property key="styleArray" type="string" multiline="true" required="false">
             <caption>Style Array</caption>
             <category>Customisation</category>
             <description>Use this to add custom styles to your maps.</description>
         </property>
-		
+
+        <property key="showProgress" type="boolean" defaultValue="true">
+            <caption>Show a progress bar when loading</caption>
+            <category>Loader</category>
+            <description>If the map has a lot of markers to load, it can appear unresponsive. This progress bar will tell the user it is loading the markers</description>
+        </property>
+        <property key="progressMessage" type="translatableString" required="false">
+            <caption>Loading message</caption>
+            <category>Loader</category>
+            <description>The message that appears in the progress bar</description>
+        </property>
+
     </properties>
 </widget>
-
