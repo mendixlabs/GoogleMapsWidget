@@ -37,7 +37,7 @@
         <property key="xpathConstraint" type="entityConstraint" entityProperty="mapEntity" required="false">
             <caption>XPath Constraint</caption>
             <category>Data source</category>
-            <description>The XPath constraint on the objects.</description> 
+            <description>The XPath constraint on the objects.</description>
         </property>
         <property key="gotocontext" type="boolean" defaultValue="false">
             <caption>Pan to context</caption>
@@ -49,28 +49,34 @@
             <category>Data source</category>
             <description>The attribute that will be displayed in the marker info bubble. (Not required)</description>
             <attributeTypes>
-                <attributeType name="String"/> 
+                <attributeType name="String"/>
             </attributeTypes>
+        </property>
+        <property key="onClickMarkerMicroflow" type="microflow" required="false" defaultValue="" entityProperty="mapEntity">
+            <caption>Onclick microflow</caption>
+            <category>Data source</category>
+            <description>Microflow that will be exectuted when you click on a marker. Takes the entity of the Objects as input parameter</description>
+            <returnType type="Void"></returnType>
         </property>
         <property key="mapHeight" type="integer" defaultValue="350">
             <caption>Height</caption>
             <category>Appearance</category>
-            <description>The map's height in px.</description> 
+            <description>The map's height in px.</description>
         </property>
         <property key="mapWidth" type="string" defaultValue="100%">
             <caption>Width</caption>
             <category>Appearance</category>
-            <description>The map's width in px or percent.</description> 
+            <description>The map's width in px or percent.</description>
         </property>
         <property key="defaultLat" type="string" defaultValue="0.0">
             <caption>Default latitude</caption>
             <category>Behavior</category>
-            <description>Default latitude for the map to start at.</description> 
+            <description>Default latitude for the map to start at.</description>
         </property>
         <property key="defaultLng" type="string" defaultValue="0.0">
             <caption>Default longitude</caption>
             <category>Behavior</category>
-            <description>Default longitude for the map to start at.</description> 
+            <description>Default longitude for the map to start at.</description>
         </property>
         <property key="defaultMapType" type="enumeration" defaultValue="ROADMAP">
             <caption>Maptype</caption>
@@ -86,12 +92,12 @@
         <property key="lowestZoom" type="integer" defaultValue="15">
             <caption>Single item zoom level</caption>
             <category>Behavior</category>
-            <description>The zoom level used when displaying a single item. 1 is the whole world, 15 is city level, 20 is house level.</description> 
+            <description>The zoom level used when displaying a single item. 1 is the whole world, 15 is city level, 20 is house level.</description>
         </property>
         <property key="updateRefresh" type="boolean" defaultValue="false">
             <caption>Refresh on entity changes</caption>
             <category>Behavior</category>
-            <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description> 
+            <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description>
         </property>
         <property key="latAttr" type="attribute" entityProperty="mapEntity" required="true" isPath="optional" pathType="reference">
             <caption>Latitude attribute</caption>
@@ -145,13 +151,12 @@
                 </property>
             </properties>
         </property>
-		
+
 		<property key="styleArray" type="string" multiline="true" required="false">
             <caption>Style Array</caption>
             <category>Customisation</category>
             <description>Use this to add custom styles to your maps.</description>
         </property>
-		
+
     </properties>
 </widget>
-
