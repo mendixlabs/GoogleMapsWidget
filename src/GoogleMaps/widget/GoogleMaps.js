@@ -346,6 +346,12 @@ define([
                 this._markerCache = [];
             }
 
+            if (this.onClickMarkerMicroflow) {
+                marker.addListener("click", lang.hitch(this, function () {
+                    this._execMf(this.onClickMarkerMicroflow, obj.mxObj.getGuid());
+                }));
+            }
+
             if (dojoArray.indexOf(this._markerCache, marker) === -1) {
                 this._markerCache.push(marker);
             }
@@ -372,6 +378,30 @@ define([
                 this._refreshMap([ this._contextObj ], callback);
             } else {
                 mendix.lang.nullExec(callback);
+            }
+        },
+
+        _execMf: function (mf, guid, cb) {
+            logger.debug(this.id + "._execMf");
+            if (mf && guid) {
+                mx.data.action({
+                    params: {
+                        applyto: "selection",
+                        actionname: mf,
+                        guids: [guid]
+                    },
+                    store: {
+                        caller: this.mxform
+                    },
+                    callback: lang.hitch(this, function (obj) {
+                        if (cb && typeof cb === "function") {
+                            cb(obj);
+                        }
+                    }),
+                    error: function (error) {
+                        console.debug(error.description);
+                    }
+                }, this);
             }
         }
     });

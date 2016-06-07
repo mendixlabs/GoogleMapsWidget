@@ -52,6 +52,12 @@
                 <attributeType name="String"/>
             </attributeTypes>
         </property>
+        <property key="onClickMarkerMicroflow" type="microflow" required="false" defaultValue="" entityProperty="mapEntity">
+            <caption>Onclick microflow</caption>
+            <category>Data source</category>
+            <description>Microflow that will be exectuted when you click on a marker. Takes the entity of the Objects as input parameter</description>
+            <returnType type="Void"></returnType>
+        </property>
         <property key="mapHeight" type="integer" defaultValue="350">
             <caption>Height</caption>
             <category>Appearance</category>
