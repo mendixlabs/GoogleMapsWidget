@@ -77,11 +77,9 @@ define([
                 this._resizeTimer = setTimeout(lang.hitch(this, function () {
                     logger.debug(this.id + ".resize");
                     google.maps.event.trigger(this._googleMap, "resize");
-                    // TODO: Problem in a TabContainer is that it will not move to context if set. This can be solved by adding the next lines,
-                    // but this will result in jumping back to the previous position when resizing in general.
-                    // if (this.gotocontext) {
-                    //     this._goToContext();
-                    // }
+                    if (this.gotocontext) {
+                        this._goToContext();
+                    }
                 }), 250);
             }
         },
