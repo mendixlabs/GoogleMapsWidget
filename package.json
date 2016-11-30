@@ -1,12 +1,11 @@
 {
   "name": "GoogleMaps",
-  "version": "5.8.1",
+  "version": "5.9.0",
   "description": "",
   "license": "",
   "author": "",
   "private": true,
-  "dependencies": {
-  },
+  "dependencies": {},
   "devDependencies": {
     "del": "^2.2.2",
     "gulp": "^3.9.1",

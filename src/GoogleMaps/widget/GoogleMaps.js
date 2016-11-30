@@ -1,5 +1,4 @@
-/*jslint white:true, nomen: true, plusplus: true */
-/*global mx, define, require, browser, devel, console, google, window */
+/*global google */
 
 define([
     "dojo/_base/declare",
@@ -50,10 +49,12 @@ define([
                 if (google.loader && google.loader.Secure === false) {
                     google.loader.Secure = true;
                 }
+                window._googleMapsLoading = true;
                 google.load("maps", 3, {
                     other_params: params,
                     callback: lang.hitch(this, function () {
                         logger.debug(this.id + ".update load Google maps callback");
+                        window._googleMapsLoading = false;
                         this._loadMap(callback);
                     })
                 });
@@ -64,7 +65,11 @@ define([
                     google.maps.event.trigger(this._googleMap, "resize");
                 } else {
                     logger.debug(this.id + ".update has no _googleMap");
-                    this._loadMap(callback);
+                    if (window._googleMapsLoading) {
+                        this._waitForGoogleLoad(callback);
+                    } else {
+                        this._loadMap(callback);
+                    }
                 }
             }
         },
@@ -82,6 +87,26 @@ define([
                     }
                 }), 250);
             }
+        },
+
+        _waitForGoogleLoad: function (callback) {
+            logger.debug(this.id + "._waitForGoogleLoad");
+            var interval = null,
+                i = 0,
+                timeout = 5000; // We'll timeout if google maps is not loaded
+            var intervalFunc = lang.hitch(this, function () {
+                i++;
+                if (i > timeout) {
+                    logger.warn(this.id + "._waitForGoogleLoad: it seems Google Maps is not loaded in the other widget. Quitting");
+                    this._executeCallback(callback);
+                    clearInterval(interval);
+                }
+                if (!window._googleMapsLoading) {
+                    this._loadMap(callback);
+                    clearInterval(interval);
+                }
+            });
+            interval = setInterval(intervalFunc, 1);
         },
 
         _resetSubscriptions: function () {
@@ -137,7 +162,7 @@ define([
 
             this._fetchMarkers();
 
-            mendix.lang.nullExec(callback);
+            this._executeCallback(callback);
         },
 
         _fetchMarkers: function (callback) {
@@ -197,7 +222,7 @@ define([
                     this._googleMap.fitBounds(bounds);
                 }
 
-                mendix.lang.nullExec(callback);
+                this._executeCallback(callback);
             }));
         },
 
@@ -253,7 +278,7 @@ define([
                 });
             } else if (!this._contextObj && (xpath.indexOf("[%CurrentObject%]") > -1)) {
                 console.warn("No context for xpath, not fetching.");
-                mendix.lang.nullExec(callback);
+                this._executeCallback(callback);
             } else {
                 mx.data.get({
                     xpath: xpath,
@@ -289,7 +314,7 @@ define([
             if (!cached) {
                 this._fetchFromDB(callback);
             } else {
-                mendix.lang.nullExec(callback);
+                this._executeCallback(callback);
             }
         },
 
@@ -375,7 +400,7 @@ define([
             if (this._googleMap && this._contextObj) {
                 this._refreshMap([ this._contextObj ], callback);
             } else {
-                mendix.lang.nullExec(callback);
+                this._executeCallback(callback);
             }
         },
 
@@ -400,6 +425,12 @@ define([
                         console.debug(error.description);
                     }
                 }, this);
+            }
+        },
+
+        _executeCallback: function (cb) {
+            if (cb && typeof cb === "function") {
+                cb();
             }
         }
     });
