@@ -24,6 +24,7 @@
         OxZCHInBvwQYAKY4VALn8wykAAAAAElFTkSuQmCC
     </icon>
     <properties>
+        <!-- BEHAVIOR -->
         <property key="apiAccessKey" type="string" required="false">
             <caption>Maps API Access Key</caption>
             <category>Behavior</category>
@@ -44,6 +45,63 @@
             <category>Behavior</category>
             <description>If set to true, if the dataview object changes, the map will pan automatically to the accompanying marker. In this case, the widget will assume that the contextobject contains a lat and long attribute.</description>
         </property>
+        <property key="defaultLat" type="string" defaultValue="0.0">
+            <caption>Default latitude</caption>
+            <category>Behavior</category>
+            <description>Default latitude for the map to start at.</description>
+        </property>
+        <property key="defaultLng" type="string" defaultValue="0.0">
+            <caption>Default longitude</caption>
+            <category>Behavior</category>
+            <description>Default longitude for the map to start at.</description>
+        </property>
+        <property key="lowestZoom" type="integer" defaultValue="15">
+            <caption>Single item zoom level</caption>
+            <category>Behavior</category>
+            <description>The zoom level used when displaying a single item. 1 is the whole world, 15 is city level, 20 is house level.</description>
+        </property>
+        <property key="updateRefresh" type="boolean" defaultValue="false">
+            <caption>Refresh on entity changes</caption>
+            <category>Behavior</category>
+            <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description>
+        </property>
+        <!-- Map CONTROLS -->
+        <property key="opt_drag" type="boolean" defaultValue="true">
+            <caption>Drag</caption>
+            <category>Map controls</category>
+            <description>Enable/disable dragging a map using the mouse</description>
+        </property>
+        <property key="opt_mapcontrol" type="boolean" defaultValue="true">
+            <caption>Type</caption>
+            <category>Map controls</category>
+            <description>Enable/disable Map Type control</description>
+        </property>
+        <property key="opt_scroll" type="boolean" defaultValue="true">
+            <caption>Scroll</caption>
+            <category>Map controls</category>
+            <description>Enable/disable using the scrollwheel to zoom in/out</description>
+        </property>
+        <property key="opt_streetview" type="boolean" defaultValue="true">
+            <caption>Streetview</caption>
+            <category>Map controls</category>
+            <description>Enable/disable Streetview control</description>
+        </property>
+        <property key="opt_zoomcontrol" type="boolean" defaultValue="true">
+            <caption>Zoom Control</caption>
+            <category>Map controls</category>
+            <description>Enable/disable Zoom control</description>
+        </property>
+        <property key="opt_tilt" type="enumeration" defaultValue="d0">
+            <caption>Tilt</caption>
+            <category>Map controls</category>
+            <description>Angle of the map. This can be set to 45 degrees, if this is available for some locations and only when using type Satellite or Hybrid. It will automatically switch to 0 degrees if it is not available.</description>
+            <enumerationValues>
+                <enumerationValue key="d0">0</enumerationValue>
+                <enumerationValue key="d45">45</enumerationValue>
+            </enumerationValues>
+        </property>
+
+        <!-- DATASOURCE -->
         <property key="markerDisplayAttr" type="attribute" required="false" entityProperty="mapEntity" isPath="optional" pathType="reference">
             <caption>Marker attribute</caption>
             <category>Data source</category>
@@ -57,47 +115,6 @@
             <category>Data source</category>
             <description>Microflow that will be exectuted when you click on a marker. Takes the entity of the Objects as input parameter</description>
             <returnType type="Void"></returnType>
-        </property>
-        <property key="mapHeight" type="integer" defaultValue="350">
-            <caption>Height</caption>
-            <category>Appearance</category>
-            <description>The map's height in px.</description>
-        </property>
-        <property key="mapWidth" type="string" defaultValue="100%">
-            <caption>Width</caption>
-            <category>Appearance</category>
-            <description>The map's width in px or percent.</description>
-        </property>
-        <property key="defaultLat" type="string" defaultValue="0.0">
-            <caption>Default latitude</caption>
-            <category>Behavior</category>
-            <description>Default latitude for the map to start at.</description>
-        </property>
-        <property key="defaultLng" type="string" defaultValue="0.0">
-            <caption>Default longitude</caption>
-            <category>Behavior</category>
-            <description>Default longitude for the map to start at.</description>
-        </property>
-        <property key="defaultMapType" type="enumeration" defaultValue="ROADMAP">
-            <caption>Maptype</caption>
-            <category>Appearance</category>
-            <description>Set the default map type</description>
-            <enumerationValues>
-                <enumerationValue key="ROADMAP">Roadmap</enumerationValue>
-                <enumerationValue key="SATELLITE">Satellite</enumerationValue>
-                <enumerationValue key="HYBRID">Hybrid</enumerationValue>
-                <enumerationValue key="TERRAIN">Terrain</enumerationValue>
-            </enumerationValues>
-        </property>
-        <property key="lowestZoom" type="integer" defaultValue="15">
-            <caption>Single item zoom level</caption>
-            <category>Behavior</category>
-            <description>The zoom level used when displaying a single item. 1 is the whole world, 15 is city level, 20 is house level.</description>
-        </property>
-        <property key="updateRefresh" type="boolean" defaultValue="false">
-            <caption>Refresh on entity changes</caption>
-            <category>Behavior</category>
-            <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description>
         </property>
         <property key="latAttr" type="attribute" entityProperty="mapEntity" required="true" isPath="optional" pathType="reference">
             <caption>Latitude attribute</caption>
@@ -120,6 +137,28 @@
                 <attributeType name="Decimal"/>
                 <attributeType name="String"/>
             </attributeTypes>
+        </property>
+        <!-- APPEARANCE -->
+        <property key="mapHeight" type="integer" defaultValue="350">
+            <caption>Height</caption>
+            <category>Appearance</category>
+            <description>The map's height in px.</description>
+        </property>
+        <property key="mapWidth" type="string" defaultValue="100%">
+            <caption>Width</caption>
+            <category>Appearance</category>
+            <description>The map's width in px or percent.</description>
+        </property>
+        <property key="defaultMapType" type="enumeration" defaultValue="ROADMAP">
+            <caption>Maptype</caption>
+            <category>Appearance</category>
+            <description>Set the default map type</description>
+            <enumerationValues>
+                <enumerationValue key="ROADMAP">Roadmap</enumerationValue>
+                <enumerationValue key="SATELLITE">Satellite</enumerationValue>
+                <enumerationValue key="HYBRID">Hybrid</enumerationValue>
+                <enumerationValue key="TERRAIN">Terrain</enumerationValue>
+            </enumerationValues>
         </property>
         <property key="enumAttr" type="attribute" entityProperty="mapEntity" required="false" isPath="optional" pathType="reference">
             <caption>Enum attribute</caption>
@@ -151,13 +190,13 @@
                 </property>
             </properties>
         </property>
-
+        <!-- CUSTOMISATION -->
         <property key="styleArray" type="string" multiline="true" required="false">
             <caption>Style Array</caption>
             <category>Customisation</category>
             <description>Use this to add custom styles to your maps.</description>
         </property>
-
+        <!-- LOADER -->
         <property key="showProgress" type="boolean" defaultValue="true">
             <caption>Show a progress bar when loading</caption>
             <category>Loader</category>
@@ -168,6 +207,5 @@
             <category>Loader</category>
             <description>The message that appears in the progress bar</description>
         </property>
-
     </properties>
 </widget>

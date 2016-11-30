@@ -146,17 +146,24 @@ define([
             });
 
             this._defaultPosition = new google.maps.LatLng(this.defaultLat, this.defaultLng);
-			var mapOptions = {
+
+            var mapOptions = {
                 zoom: 11,
+                draggable: this.opt_drag,
+                scrollwheel: this.opt_scroll,
                 center: this._defaultPosition,
                 mapTypeId: google.maps.MapTypeId[this.defaultMapType] || google.maps.MapTypeId.ROADMAP,
+                mapTypeControl: this.opt_mapcontrol,
                 mapTypeControlOption: {
                     style: google.maps.MapTypeControlStyle.HORIZONTAL_BAR
-                }
-			};
-			if (this.styleArray !== ""){
-				mapOptions.styles = JSON.parse(this.styleArray);
-			}
+                },
+                streetViewControl: this.opt_streetview,
+                zoomControl: this.opt_zoomcontrol,
+                tilt: parseInt(this.opt_tilt.replace("d", ""), 10)
+            };
+            if (this.styleArray !== ""){
+                mapOptions.styles = JSON.parse(this.styleArray);
+            }
 
             this._googleMap = new google.maps.Map(this.mapContainer, mapOptions);
 
