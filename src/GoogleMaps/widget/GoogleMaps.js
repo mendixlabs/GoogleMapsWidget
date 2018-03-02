@@ -276,7 +276,7 @@ define([
 
             this._removeAllMarkers();
             if (this._contextObj) {
-                xpath = xpath.replace("[%CurrentObject%]", this._contextObj.getGuid());
+                xpath = xpath.replace(/\[%CurrentObject%\]/g, this._contextObj.getGuid());
                 mx.data.get({
                     xpath: xpath,
                     callback: lang.hitch(this, function (objs) {
