@@ -65,6 +65,17 @@
             <category>Behavior</category>
             <description>This option refreshes all the markers when an object of the corresponding entity is changed/added/removed. This will retrieve the entire list of objects everytime and map them again. Be aware that this might give performance issues when mapping big amounts or mapping a frequently used entity.</description>
         </property>
+        <property key="gestureHandling" type="enumeration" defaultValue="auto">
+            <caption>Gesture handling</caption>
+            <category>Behavior</category>
+            <description>This is an advanced feature: Controls how the API handles gestures on the map. Leave this to 'auto' and change if necessary. https://developers.google.com/maps/documentation/javascript/interaction#gestureHandling</description>
+            <enumerationValues>
+                 <enumerationValue key="auto">auto</enumerationValue>
+                 <enumerationValue key="cooperative">cooperative</enumerationValue>
+                 <enumerationValue key="greedy">greedy</enumerationValue>
+                 <enumerationValue key="none">none</enumerationValue>
+            </enumerationValues>
+        </property>
         <!-- Map CONTROLS -->
         <property key="opt_drag" type="boolean" defaultValue="true">
             <caption>Drag</caption>

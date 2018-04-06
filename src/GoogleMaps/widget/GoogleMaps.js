@@ -159,6 +159,7 @@ define([
                 },
                 streetViewControl: this.opt_streetview,
                 zoomControl: this.opt_zoomcontrol,
+                gestureHandling: this.gestureHandling,
                 tilt: parseInt(this.opt_tilt.replace("d", ""), 10)
             };
             if (this.styleArray !== ""){
