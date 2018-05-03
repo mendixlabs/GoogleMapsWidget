@@ -1,21 +1,21 @@
-#Google Maps widget
-##Description
+# Google Maps widget
+## Description
 Bring the world into your application, with the Google Maps widget!
 
-##Typical usage scenario
+## Typical usage scenario
 
 Giving a visual representation of an address.
 Showing an overview where all your branches/members/clients/orders/etc. are.
  
-##Features and limitations
+## Features and limitations
 Tap directly into all the power of Google Maps.
 Easy to implement.
 No route planning or advanced features yet.
 
-##Dependencies
+## Dependencies
 Mendix 5.x Environment
 
-##Configuration
+## Configuration
 One of the most important things to keep in mind when implementing this widget is the Google Maps terms of use. These can be found here: Terms of Use. [Chapter 9.1 is especially important](https://developers.google.com/maps/terms#9-license-requirements).
 
         Free, Public Accessibility to Your Maps API Implementation. Your Maps API Implementation must be generally accessible to users without charge. You may require users to log in to your Maps API Implementation if you do not require users to pay a fee. U nless you have entered into a separate written agreement with Google or obtained Google's written permission , your Maps API Implementation must not:
@@ -37,7 +37,7 @@ To finish up, just enter the correct values into the widget. For more informatio
 The Google Maps Javascript API v3 does not require an API key to function properly. However, Google strongly encourages you to load the Maps API using an APIs Console key which allows you to monitor your application's Maps API usage.
 You can get an API key by following [the steps provided here](https://developers.google.com/maps/documentation/javascript/get-api-key)
 
-##Properties
+## Properties
 * Maps API Access Key: The Google Maps JavaScript API v3 does not require an API key to function correctly.
 * Height: The height the widget will have (in pixels) . This attribute is required.
 * Width: The width of the widget, can be in pixels or percentage.
