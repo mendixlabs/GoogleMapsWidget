@@ -1,4 +1,7 @@
 # Google Maps widget
+
+> **Note: Google has updated the License agreements per July 16 2018, see [Price changes](https://cloud.google.com/maps-platform/user-guide/pricing-changes/). For commercial applications, a key (see Configuration) is required**
+
 ## Description
 Bring the world into your application, with the Google Maps widget!
 
